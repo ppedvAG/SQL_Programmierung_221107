@@ -168,7 +168,63 @@ select $partition.fzahl(nummer), min(nummer), max(nummer), count(*) from parttab
 group by $partition.fzahl(nummer)
 
 
---Kombinierbar
+--Kombinierbar mit kompression
+
+
+---Daten archivieren.. Daten in andere Tabellen verschieben
+--wie sehe , was aktuell Sache ist
+
+
+create table archiv (id int not null, nummer int, spx char(4100) )  on bis200
+
+alter table parttab switch partition 1 to archiv
+
+select * from parttab
+select * from archiv
+
+--100MB/Sec
+--Part1  1 GB --> genausolange wie mit 100 GB ..oder mit 1 MB
+
+--Der Teil der Partition, der archiviert werden soll muss auch dort liegen wo doe Arhivtabelle liegt
+--200 bis 5000  P2  bis5000
+archiv auf bis100
+
+--Die Archivtabelle muss auf der DGruppe sein, auf die verschoben wird
+
+/****** Object:  PartitionFunction [fzahl]    Script Date: 11.07.2022 15:30:05 ******/
+CREATE PARTITION FUNCTION [fzahl](int) AS RANGE LEFT FOR VALUES (250, 5000)
+GO
+
+
+/****** Object:  PartitionScheme [schZahl]    Script Date: 11.07.2022 15:30:22 ******/
+CREATE PARTITION SCHEME [schZahl] AS PARTITION [fzahl] TO ([bis200], [bis5000], [rest])
+GO
+
+--Grenzen sind inklusive
+--Jahresweise 
+CREATE PARTITION FUNCTION [fzahl](datetime) 
+AS RANGE LEFT FOR VALUES (  '31.12.2021 23:59.59.999' , )
+GO
+
+-- A bis M   N bis S   T bis Z
+CREATE PARTITION FUNCTION [fzahl](varchar(50)) 
+AS RANGE LEFT FOR VALUES ( 'N', 'T' )
+GO
+
+
+--macht total sinn
+CREATE PARTITION SCHEME [schZahl] AS PARTITION [fzahl] all TO
+([PRIMARY] )
+GO
+
+
+
+5,7 Mrd DS
+Messdaten
+50 Maschinen
+IX 
+
+
 
 
 

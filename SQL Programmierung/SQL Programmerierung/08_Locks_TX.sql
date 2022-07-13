@@ -15,8 +15,12 @@ begin tran
 select @@TRANCOUNT
 select * from kunden
 update kunden set city = 'Paris' where customerid = 'ALFKI'
+update customers set city = 'Paris' where customerid = 'ALFKI'
+
+
 rollback-- rückgängig
 commit-- jetzt fix
+
 
 
 
@@ -32,4 +36,16 @@ commit-- jetzt fix
 --Sperrniveaus:
 --Datenbank
 --Tabelle--> Partition--->Block-->Seiten--> DS
+
+/*
+nur per IX kann das Sperrniveau gesenkt werden
+ist eine Zeile betroffen oder wenige Zeilensperre  (91bytes)
+sind aber viele Zeilen einer Seiten betroffen--> statt 300 Sperrren zu setzne--> 1* Seitensperre (91bytes)
+--> jetzt sind aber auch DS gesperrt , die man gar nicht braucht
+sind mehr Seiten betroffen, dann Block
+ist fast gesamte Tabelle betroffen --> Tabelle
+
+Ausnahme: Partitionsperre geht auch ohne Indizes
+
+halte daher TX  so kurz wie möglich
 

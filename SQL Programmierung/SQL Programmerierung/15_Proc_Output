@@ -1,0 +1,29 @@
+--OUTPUT = auch INPUT
+--man muss OUTPUT explizit angeben bei der Ausführung
+
+create  proc gpdemo2 @par1 int ,@par2 int output
+as
+select @par2= @par1 *100
+
+
+exec gpdemo2 10, 20
+
+
+
+create or alter proc gpdemo2 @par1 int ,@par2 int output
+as
+select @par2= @par1 *100
+select @par2
+
+
+exec gpdemo2 10, 20
+select @par2
+
+declare @var1 as int
+
+------------------------------------->
+exec gpdemo2 10, @par2=@var1 output
+select @var1
+
+
+
